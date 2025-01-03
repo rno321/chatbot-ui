@@ -32,11 +32,11 @@ module.exports = withBundleAnalyzer(
           headers: [
             {
               key: 'Content-Security-Policy',
-              value: "frame-ancestors 'self' http://localhost:3001"
+              value: `frame-ancestors 'self' ${process.env.NEXT_PUBLIC_FRAME_ANCESTOR_URL}`
             },
             {
               key: 'X-Frame-Options',
-              value: 'ALLOW-FROM http://localhost:3001'
+              value: `ALLOW-FROM ${process.env.NEXT_PUBLIC_FRAME_ANCESTOR_URL}`
             }
           ],
         },
