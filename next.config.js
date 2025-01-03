@@ -37,6 +37,14 @@ module.exports = withBundleAnalyzer(
             {
               key: 'X-Frame-Options',
               value: `ALLOW-FROM ${process.env.NEXT_PUBLIC_FRAME_ANCESTOR_URL}`
+            },
+            {
+              key: 'Access-Control-Allow-Credentials',
+              value: 'true'
+            },
+            {
+              key: 'Access-Control-Allow-Origin',
+              value: process.env.NEXT_PUBLIC_FRAME_ANCESTOR_URL
             }
           ],
         },
