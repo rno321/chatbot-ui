@@ -25,6 +25,23 @@ module.exports = withBundleAnalyzer(
         }
       ]
     },
+    async headers() {
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: "frame-ancestors 'self' http://localhost:3001"
+            },
+            {
+              key: 'X-Frame-Options',
+              value: 'ALLOW-FROM http://localhost:3001'
+            }
+          ],
+        },
+      ]
+    },
     experimental: {
       serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
     }
