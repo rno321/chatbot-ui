@@ -201,15 +201,10 @@ export const handleHostedChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const provider =
-    modelData.provider === "openai" && profile.use_azure_openai
-      ? "azure"
-      : modelData.provider
-
   let draftMessages = await buildFinalMessages(payload, profile, chatImages)
 
   let formattedMessages: any[] = []
-  if (provider === "google") {
+  if (modelData.provider === "google") {
     formattedMessages = await adaptMessagesForGoogleGemini(
       payload,
       draftMessages
@@ -218,13 +213,12 @@ export const handleHostedChat = async (
     formattedMessages = draftMessages
   }
 
-  const apiEndpoint =
-    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+  // Always use Anthropic API
+  const apiEndpoint = `/api/chat/anthropic`
 
   const requestBody = {
     chatSettings: payload.chatSettings,
-    messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : ""
+    messages: formattedMessages
   }
 
   const response = await fetchChatResponse(

@@ -234,8 +234,8 @@ export const useChatHandler = () => {
       let retrievedFileItems: Tables<"file_items">[] = []
 
       if (
-        (newMessageFiles.length > 0 || chatFiles.length > 0) &&
-        useRetrieval
+        chatSettings.use_retrieval &&
+        [...chatFiles, ...newMessageFiles].length > 0
       ) {
         setToolInUse("retrieval")
 
@@ -243,8 +243,8 @@ export const useChatHandler = () => {
           userInput,
           newMessageFiles,
           chatFiles,
-          chatSettings!.embeddingsProvider,
-          sourceCount
+          "anthropic",
+          chatSettings.retrieval_source_count
         )
       }
 

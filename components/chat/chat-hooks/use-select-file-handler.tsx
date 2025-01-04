@@ -105,7 +105,7 @@ export const useSelectFileHandler = () => {
               type: simplifiedFileType
             },
             selectedWorkspace.id,
-            chatSettings.embeddingsProvider
+            "anthropic" // default to Anthropic's embeddings provider
           )
 
           setFiles(prev => [...prev, createdFile])
@@ -166,7 +166,7 @@ export const useSelectFileHandler = () => {
                 type: simplifiedFileType
               },
               selectedWorkspace.id,
-              chatSettings.embeddingsProvider
+              "anthropic" // default to Anthropic's embeddings provider
             )
 
             setFiles(prev => [...prev, createdFile])

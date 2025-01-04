@@ -126,19 +126,20 @@ export const Message: FC<MessageProps> = ({
     }
   }, [isEditing])
 
-  const MODEL_DATA = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false
-    })),
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === message.model) as LLM
+  const MODEL_DATA = {
+    modelId: "claude-3-5-sonnet-20240620",
+    modelName: "AgentX",
+    provider: "anthropic" as ModelProvider,
+    hostedId: "claude-3-5-sonnet-20240620",
+    platformLink: "",
+    imageInput: true,
+    pricing: {
+      currency: "USD",
+      unit: "1M tokens",
+      inputCost: 3,
+      outputCost: 15
+    }
+  }
 
   const messageAssistantImage = assistantImages.find(
     image => image.assistantId === message.assistant_id

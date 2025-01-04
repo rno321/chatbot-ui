@@ -2,14 +2,14 @@ import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
-import OpenAI from "openai"
+import { Anthropic } from "@anthropic-ai/sdk"
 
 export async function POST(request: Request) {
   const json = await request.json()
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider: "anthropic" | "local"
     sourceCount: number
   }
 
@@ -23,78 +23,73 @@ export async function POST(request: Request) {
 
     const profile = await getServerProfile()
 
-    if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
-      }
+    if (embeddingsProvider === "anthropic") {
+      checkApiKey(profile.anthropic_api_key, "Anthropic")
     }
 
     let chunks: any[] = []
 
-    let openai
-    if (profile.use_azure_openai) {
-      openai = new OpenAI({
-        apiKey: profile.azure_openai_api_key || "",
-        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-12-01-preview" },
-        defaultHeaders: { "api-key": profile.azure_openai_api_key }
-      })
-    } else {
-      openai = new OpenAI({
-        apiKey: profile.openai_api_key || "",
-        organization: profile.openai_organization_id
-      })
-    }
-
-    if (embeddingsProvider === "openai") {
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: userInput
-      })
-
-      const openaiEmbedding = response.data.map(item => item.embedding)[0]
-
-      const { data: openaiFileItems, error: openaiError } =
-        await supabaseAdmin.rpc("match_file_items_openai", {
-          query_embedding: openaiEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (openaiError) {
-        throw openaiError
-      }
-
-      chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(userInput)
-
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
-    }
-
-    const mostSimilarChunks = chunks?.sort(
-      (a, b) => b.similarity - a.similarity
-    )
-
-    return new Response(JSON.stringify({ results: mostSimilarChunks }), {
-      status: 200
+    const anthropic = new Anthropic({
+      apiKey: profile.anthropic_api_key || ""
     })
+
+    if (embeddingsProvider === "anthropic") {
+      const { data: fileItems } = await supabaseAdmin
+        .from("file_items")
+        .select("*")
+        .in("file_id", uniqueFileIds)
+        .order("created_at", { ascending: true })
+
+      if (!fileItems) {
+        return new Response("No file items found", { status: 404 })
+      }
+
+      const query = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 1024,
+        messages: [
+          {
+            role: "user",
+            content: `Given the user's query: "${userInput}", analyze these file items and return the ${sourceCount} most relevant ones that best answer the query. Return them in order of relevance. Here are the file items:\n\n${fileItems.map(item => item.content).join("\n\n")}`
+          }
+        ]
+      })
+
+      const relevantItems = fileItems.slice(0, sourceCount)
+
+      return new Response(JSON.stringify({ results: relevantItems }))
+    } else if (embeddingsProvider === "local") {
+      const queryEmbedding = await generateLocalEmbedding(userInput)
+
+      const { data: fileItems } = await supabaseAdmin.rpc(
+        "match_file_items_local",
+        {
+          query_embedding: queryEmbedding,
+          match_count: sourceCount,
+          file_ids: uniqueFileIds
+        }
+      )
+
+      if (!fileItems) {
+        return new Response("No file items found", { status: 404 })
+      }
+
+      return new Response(JSON.stringify({ results: fileItems }))
+    }
+
+    return new Response("Invalid embeddings provider", { status: 400 })
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "API Key not found. Please set it in your profile settings."
+    } else if (errorMessage.toLowerCase().includes("incorrect api key")) {
+      errorMessage =
+        "API Key is incorrect. Please fix it in your profile settings."
+    }
+
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

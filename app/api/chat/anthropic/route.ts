@@ -20,39 +20,60 @@ export async function POST(request: NextRequest) {
 
     checkApiKey(profile.anthropic_api_key, "Anthropic")
 
+    // Extract system message (first message) and user/assistant messages
+    const systemMessage = messages[0]?.content || ""
     let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
 
     ANTHROPIC_FORMATTED_MESSAGES = ANTHROPIC_FORMATTED_MESSAGES?.map(
       (message: any) => {
-        const messageContent =
-          typeof message?.content === "string"
-            ? [message.content]
-            : message?.content
+        const role = message.role === "assistant" ? "assistant" : "user"
+        let messageContent = message.content
 
-        return {
-          ...message,
-          content: messageContent.map((content: any) => {
-            if (typeof content === "string") {
-              // Handle the case where content is a string
-              return { type: "text", text: content }
-            } else if (
-              content?.type === "image_url" &&
-              content?.image_url?.url?.length
-            ) {
-              return {
-                type: "image",
-                source: {
-                  type: "base64",
-                  media_type: getMediaTypeFromDataURL(content.image_url.url),
-                  data: getBase64FromDataURL(content.image_url.url)
+        // Handle string content
+        if (typeof messageContent === "string") {
+          return {
+            role,
+            content: [{ type: "text", text: messageContent }]
+          }
+        }
+
+        // Handle array content (for images)
+        if (Array.isArray(messageContent)) {
+          return {
+            role,
+            content: messageContent.map((content: any) => {
+              if (typeof content === "string") {
+                return { type: "text", text: content }
+              } else if (
+                content?.type === "image_url" &&
+                content?.image_url?.url?.length
+              ) {
+                return {
+                  type: "image",
+                  source: {
+                    type: "base64",
+                    media_type: getMediaTypeFromDataURL(content.image_url.url),
+                    data: getBase64FromDataURL(content.image_url.url)
+                  }
                 }
               }
-            } else {
               return content
-            }
-          })
+            })
+          }
+        }
+
+        // Default case
+        return {
+          role,
+          content: [{ type: "text", text: String(messageContent) }]
         }
       }
+    )
+
+    console.log("System message:", systemMessage)
+    console.log(
+      "Formatted messages:",
+      JSON.stringify(ANTHROPIC_FORMATTED_MESSAGES, null, 2)
     )
 
     const anthropic = new Anthropic({
@@ -61,12 +82,11 @@ export async function POST(request: NextRequest) {
 
     try {
       const response = await anthropic.messages.create({
-        model: chatSettings.model,
+        model: "claude-3-5-sonnet-20240620",
         messages: ANTHROPIC_FORMATTED_MESSAGES,
-        temperature: chatSettings.temperature,
-        system: messages[0].content,
-        max_tokens:
-          CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+        system: systemMessage,
+        max_tokens: 4096,
+        temperature: 0.7,
         stream: true
       })
 
@@ -75,19 +95,28 @@ export async function POST(request: NextRequest) {
         return new StreamingTextResponse(stream)
       } catch (error: any) {
         console.error("Error parsing Anthropic API response:", error)
+        console.error("Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        })
         return new NextResponse(
           JSON.stringify({
-            message:
-              "An error occurred while parsing the Anthropic API response"
+            message: `Error parsing Anthropic API response: ${error.message}`
           }),
           { status: 500 }
         )
       }
     } catch (error: any) {
       console.error("Error calling Anthropic API:", error)
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
       return new NextResponse(
         JSON.stringify({
-          message: "An error occurred while calling the Anthropic API"
+          message: `Error calling Anthropic API: ${error.message}`
         }),
         { status: 500 }
       )
@@ -99,13 +128,14 @@ export async function POST(request: NextRequest) {
     if (errorMessage.toLowerCase().includes("api key not found")) {
       errorMessage =
         "Anthropic API Key not found. Please set it in your profile settings."
-    } else if (errorCode === 401) {
+    } else if (errorMessage.toLowerCase().includes("incorrect api key")) {
       errorMessage =
         "Anthropic API Key is incorrect. Please fix it in your profile settings."
     }
 
     return new NextResponse(JSON.stringify({ message: errorMessage }), {
-      status: errorCode
+      status: errorCode,
+      headers: { "Content-Type": "application/json" }
     })
   }
 }
