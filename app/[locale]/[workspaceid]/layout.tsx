@@ -9,6 +9,7 @@ import { LLMID } from "@/types"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
+import ProfileMenu from "@/components/utility/profile-menu"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -99,5 +100,12 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     return <Loading />
   }
 
-  return <Dashboard>{children}</Dashboard>
+  return (
+    <>
+      <div className="absolute right-4 top-4 z-50">
+        <ProfileMenu />
+      </div>
+      <Dashboard>{children}</Dashboard>
+    </>
+  )
 }

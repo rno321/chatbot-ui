@@ -104,7 +104,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           size="icon"
           onClick={handleToggleSidebar}
         >
-          <IconChevronCompactRight size={24} />
+          <IconChevronCompactRight className="size-4" />
         </Button>
       </div>
     </div>
