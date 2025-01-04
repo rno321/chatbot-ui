@@ -3,6 +3,7 @@ import { ContentType, DataListType } from "@/types"
 import { FC } from "react"
 import { SidebarCreateButtons } from "./sidebar-create-buttons"
 import { SidebarDataList } from "./sidebar-data-list"
+import { SidebarLogo } from "./sidebar-logo"
 
 interface SidebarContentProps {
   contentType: ContentType
@@ -17,6 +18,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({
 }) => {
   return (
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
+      <SidebarLogo />
       <div className="mt-2 flex items-center">
         <SidebarCreateButtons
           contentType={contentType}
