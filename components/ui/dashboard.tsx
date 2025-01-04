@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { cn } from "@/lib/utils"
-import { ContentType } from "@/types"
 import { IconChevronCompactRight } from "@tabler/icons-react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
@@ -24,14 +23,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   const pathname = usePathname()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const tabValue = searchParams.get("tab") || "chats"
 
   const { handleSelectDeviceFile } = useSelectFileHandler()
 
-  const [contentType, setContentType] = useState<ContentType>(
-    tabValue as ContentType
-  )
   const [showSidebar, setShowSidebar] = useState(
     localStorage.getItem("showSidebar") === "true"
   )
@@ -39,12 +33,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   const onFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
-
     const files = event.dataTransfer.files
     const file = files[0]
-
     handleSelectDeviceFile(file)
-
     setIsDragging(false)
   }
 
@@ -76,24 +67,15 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           "duration-200 dark:border-none " + (showSidebar ? "border-r-2" : "")
         )}
         style={{
-          // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
         }}
       >
         {showSidebar && (
-          <Tabs
-            className="flex h-full"
-            value={contentType}
-            onValueChange={tabValue => {
-              setContentType(tabValue as ContentType)
-              router.replace(`${pathname}?tab=${tabValue}`)
-            }}
-          >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
-
-            <Sidebar contentType={contentType} showSidebar={showSidebar} />
+          <Tabs className="flex h-full" value="chats">
+            <SidebarSwitcher onContentTypeChange={() => {}} />
+            <Sidebar contentType="chats" showSidebar={showSidebar} />
           </Tabs>
         )}
       </div>
@@ -118,7 +100,6 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
             "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
           )}
           style={{
-            // marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
             transform: showSidebar ? "rotate(180deg)" : "rotate(0deg)"
           }}
           variant="ghost"
