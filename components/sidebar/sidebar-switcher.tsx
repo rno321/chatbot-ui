@@ -14,7 +14,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
   return (
-    <div className="flex flex-col justify-between border-r-2 pb-5">
+    <div className="flex flex-col justify-between">
       <TabsList className="bg-background grid h-[440px] grid-rows-7"></TabsList>
     </div>
   )

@@ -63,9 +63,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       <CommandK />
 
       <div
-        className={cn(
-          "duration-200 dark:border-none " + (showSidebar ? "border-r-2" : "")
-        )}
+        className={cn("border-r-2 duration-200 dark:border-none")}
         style={{
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",

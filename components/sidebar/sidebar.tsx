@@ -48,15 +48,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   }
 
   return (
-    <TabsContent
-      className="m-0 w-full space-y-2"
-      style={{
-        minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-      }}
-      value={contentType}
-    >
+    <TabsContent className="m-0 w-full" value={contentType}>
       <div className="flex h-full flex-col p-3">
         {(() => {
           switch (contentType) {
