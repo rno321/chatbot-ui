@@ -25,21 +25,7 @@ export default function ChatPage() {
 
   return (
     <>
-      {chatMessages.length === 0 ? (
-        <div className="relative flex h-full flex-col items-center justify-center">
-          <div className="absolute mb-20 text-xl font-bold">
-            Please describe your workflow...
-          </div>
-
-          <div className="flex grow flex-col items-center justify-center" />
-
-          <div className="w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
-            <ChatInput />
-          </div>
-        </div>
-      ) : (
-        <ChatUI />
-      )}
+      <ChatUI />
 
       <div className="absolute bottom-3 right-4 flex h-[40px] items-center space-x-2 sm:bottom-8">
         <button

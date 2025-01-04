@@ -13,6 +13,16 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
+  if (!chatMessages || chatMessages.length === 0) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center">
+        <div className="text-xl text-gray-500">
+          Please describe your workflow...
+        </div>
+      </div>
+    )
+  }
+
   return chatMessages
     .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
     .map((chatMessage, index, array) => {

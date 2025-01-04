@@ -59,12 +59,20 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const [showFeedback, setShowFeedback] = useState(false)
 
   useEffect(() => {
-    if (!params.chatid) return
+    if (!params.chatid) {
+      setLoading(false)
+      return
+    }
 
     const fetchData = async () => {
-      await fetchChat()
-      await fetchMessages()
-      setLoading(false)
+      try {
+        await fetchChat()
+        await fetchMessages()
+      } catch (error) {
+        console.error("Error fetching chat data:", error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchData()
