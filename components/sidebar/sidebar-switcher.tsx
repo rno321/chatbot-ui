@@ -1,8 +1,6 @@
 "use client"
 
-import { IconMessage } from "@tabler/icons-react"
 import { FC } from "react"
-import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { TabsList } from "@/components/ui/tabs"
 import { ContentType } from "@/types"
 
@@ -17,13 +15,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 }) => {
   return (
     <div className="flex flex-col justify-between border-r-2 pb-5">
-      <TabsList className="bg-background grid h-[440px] grid-rows-7">
-        <SidebarSwitchItem
-          icon={<IconMessage size={SIDEBAR_ICON_SIZE} />}
-          contentType="chats"
-          onContentTypeChange={onContentTypeChange}
-        />
-      </TabsList>
+      <TabsList className="bg-background grid h-[440px] grid-rows-7"></TabsList>
     </div>
   )
 }
