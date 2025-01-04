@@ -27,7 +27,9 @@ export default function ChatPage() {
     <>
       {chatMessages.length === 0 ? (
         <div className="relative flex h-full flex-col items-center justify-center">
-          <div className="absolute mb-20 text-4xl font-bold">AgentX</div>
+          <div className="absolute mb-20 text-xl font-bold">
+            Please describe your workflow...
+          </div>
 
           <div className="flex grow flex-col items-center justify-center" />
 
