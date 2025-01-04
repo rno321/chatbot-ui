@@ -10,6 +10,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
 import ProfileMenu from "@/components/utility/profile-menu"
+import ThemeToggle from "@/components/utility/theme-toggle"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -104,6 +105,9 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     <>
       <div className="absolute right-4 top-4 z-50">
         <ProfileMenu />
+      </div>
+      <div className="absolute bottom-4 left-4 z-50">
+        <ThemeToggle />
       </div>
       <Dashboard>{children}</Dashboard>
     </>
