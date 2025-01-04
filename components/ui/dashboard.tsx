@@ -12,7 +12,7 @@ import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 
-export const SIDEBAR_WIDTH = 350
+export const SIDEBAR_WIDTH = 245 // Reduced from 350 by 30%
 
 interface DashboardProps {
   children: React.ReactNode
