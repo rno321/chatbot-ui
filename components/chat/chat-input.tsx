@@ -239,7 +239,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={t("i.e. copy my google drive files to my dropbox.")}
+          placeholder={
+            chatMessages.length === 0
+              ? t("i.e. copy my google drive files to my dropbox.")
+              : ""
+          }
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}
@@ -248,6 +252,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onPaste={handlePaste}
           onCompositionStart={() => setIsTyping(true)}
           onCompositionEnd={() => setIsTyping(false)}
+          disabled={isGenerating}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
