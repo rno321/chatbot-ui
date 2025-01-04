@@ -71,11 +71,11 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const fetchMessages = async () => {
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)
 
-    const imagePromises = await Promise.all(
-      fetchedMessages.map(async message => {
-        if (!message.image_paths) return []
+    const imagePromises = fetchedMessages.map(async message => {
+      if (!message.image_paths) return []
 
-        return message.image_paths.map(async imagePath => {
+      return Promise.all(
+        message.image_paths.map(async (imagePath: string) => {
           const { url } = await getMessageImageFromStorage(imagePath)
 
           return {
@@ -86,8 +86,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
             file: null
           }
         })
-      })
-    )
+      )
+    })
 
     const images: MessageImage[] = await Promise.all(imagePromises.flat())
     setChatImages(images)
