@@ -16,7 +16,8 @@ import { useScroll } from "./chat-hooks/use-scroll"
 import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
-import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { FeedbackDialog } from "../utility/feedback-dialog"
+import { IconMessageCircle2 } from "@tabler/icons-react"
 
 interface ChatUIProps {}
 
@@ -55,6 +56,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   } = useScroll()
 
   const [loading, setLoading] = useState(true)
+  const [showFeedback, setShowFeedback] = useState(false)
 
   useEffect(() => {
     if (!params.chatid) return
@@ -176,10 +178,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         />
       </div>
 
-      <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        <ChatSecondaryButtons />
-      </div>
-
       <div
         className="flex size-full flex-col overflow-y-auto px-4"
         onScroll={handleScroll}
@@ -191,9 +189,23 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
+      <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
         <ChatInput />
       </div>
+
+      <div className="absolute bottom-3 right-4 flex h-[40px] items-center space-x-2 sm:bottom-8">
+        <button
+          className="flex size-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+          onClick={() => setShowFeedback(true)}
+        >
+          <IconMessageCircle2 size={20} />
+        </button>
+      </div>
+
+      <FeedbackDialog
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+      />
     </div>
   )
 }
