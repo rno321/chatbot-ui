@@ -19,12 +19,10 @@ export const SidebarContent: FC<SidebarContentProps> = ({
   return (
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
       <SidebarLogo />
-      <div className="mt-2 flex items-center">
-        <SidebarCreateButtons
-          contentType={contentType}
-          hasData={data.length > 0}
-        />
-      </div>
+      <SidebarCreateButtons
+        contentType={contentType}
+        hasData={data.length > 0}
+      />
 
       <SidebarDataList
         contentType={contentType}
