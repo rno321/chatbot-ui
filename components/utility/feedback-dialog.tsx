@@ -40,14 +40,15 @@ export const FeedbackDialog: FC<FeedbackDialogProps> = ({
         throw new Error("Failed to send feedback")
       }
 
+      // Clear the feedback and close the dialog first
+      setFeedback("")
+      onClose()
+
+      // Show success toast after dialog is closed
       toast({
         description: "Thank you for your feedback!",
         duration: 3000
       })
-
-      // Clear the feedback and close the dialog
-      setFeedback("")
-      onClose()
     } catch (error) {
       console.error("Error sending feedback:", error)
       toast({
@@ -66,7 +67,7 @@ export const FeedbackDialog: FC<FeedbackDialogProps> = ({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold">
-              Send your feedback
+              We&apos;d love your feedback
             </DialogTitle>
             <button
               onClick={onClose}
@@ -77,25 +78,13 @@ export const FeedbackDialog: FC<FeedbackDialogProps> = ({
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <p className="text-gray-600">Help us improve your experience</p>
-
+        <div className="space-y-4 ">
           <Textarea
-            placeholder="Ideas to improve this page..."
+            placeholder="Any suggestions?"
             className="min-h-[120px] resize-none"
             value={feedback}
             onChange={e => setFeedback(e.target.value)}
           />
-
-          <p className="text-sm text-gray-500">
-            Need faster support? Contact{" "}
-            <a
-              href="mailto:support@agentx.biz"
-              className="text-blue-600 hover:underline"
-            >
-              support@agentx.biz
-            </a>
-          </p>
 
           <Button
             className="w-full bg-gray-500 hover:bg-gray-600"
